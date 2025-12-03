@@ -11,14 +11,14 @@ fn get_file_buffer(path: &str) -> io::BufReader<File> {
     io::BufReader::new(file)
 }
 
-fn parse_line<R: io::BufRead, F: FnMut(i16)>(reader: R, mut callback: F) -> io::Result<()> {
+fn parse_line<R: io::BufRead, F: FnMut(i32)>(reader: R, mut callback: F) -> io::Result<()> {
     for line in reader.lines() {
         let line = line?;
         let (dir_str, num_str) = line.split_at(1);
 
         let dir = if dir_str == "R" { 1 } else { -1 };
         let num = num_str
-            .parse::<i16>()
+            .parse::<i32>()
             .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
 
         callback(dir * num)
@@ -28,24 +28,33 @@ fn parse_line<R: io::BufRead, F: FnMut(i16)>(reader: R, mut callback: F) -> io::
 }
 
 fn main() {
-    let mut initial: i16 = 50;
-    let mut ans1: i16 = 0;
-    let mut ans2: i16 = 0;
+    let mut initial: i32 = 50;
+    let mut ans1: i32 = 0;
+    let mut ans2: i32 = 0;
 
     let reader = get_file_buffer("./input.txt");
-    parse_line(reader, |num: i16| {
-        for _ in 0..num.abs() {
-            if num > 0 {
-                initial += 1;
-            } else {
-                initial -= 1;
-            }
-            initial = initial.rem_euclid(100);
+    let _ = parse_line(reader, |num: i32| {
+        initial = (initial + num).rem_euclid(100);
 
-            if initial == 0 {
-                ans2 += 1;
-            }
-        }
+        // for _ in 0..num.abs() {
+        //     if num > 0 {
+        //         initial += 1;
+        //     } else {
+        //         initial -= 1;
+        //     }
+        //     initial = initial.rem_euclid(100);
+
+        //     if initial == 0 {
+        //         ans2 += 1;
+        //     }
+        // }
+        let loops = (num / 100).abs();
+        let rest = num.div_euclid(100);
+        println!("{} + {}", initial, num);
+        println!("{} & {}\n", loops, rest);
+
+        initial += num;
+        initial = initial.div_euclid(100);
 
         if initial == 0 {
             ans1 += 1
