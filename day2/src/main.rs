@@ -19,7 +19,7 @@ fn parse_line(line: &String) -> Vec<(i64, i64)> {
         .collect()
 }
 
-fn find_invalid_in_range((start, end): (i64, i64)) -> Vec<i64> {
+fn find_invalid_in_range(&(start, end): &(i64, i64)) -> Vec<i64> {
     let mut invalid: Vec<i64> = Vec::new();
     let range = start..=end;
 
@@ -56,7 +56,7 @@ fn is_invalid(num: &String) -> bool {
     return false;
 }
 
-fn find_invalid_in_range2((start, end): (i64, i64)) -> Vec<i64> {
+fn find_invalid_in_range2(&(start, end): &(i64, i64)) -> Vec<i64> {
     let mut invalid: Vec<i64> = Vec::new();
     let range = start..=end;
 
@@ -74,22 +74,22 @@ fn main() {
     let content = match read_file("./input.txt") {
         Ok(content) => content,
         Err(e) => {
-            eprintln!("Filed in reading file: {}", e);
+            eprintln!("Filed reading the file: {}", e);
             return;
         }
     };
 
     let nums = parse_line(&content);
+
     let mut sum: i64 = 0;
-    for num in nums {
+    for num in nums.iter() {
         let invalid = find_invalid_in_range(num);
         // println!("{:?} -> {:?}", num, invalid);
         sum += invalid.iter().sum::<i64>();
     }
 
-    let nums2 = parse_line(&content);
     let mut sum2: i64 = 0;
-    for num in nums2 {
+    for num in nums.iter() {
         let invalid = find_invalid_in_range2(num);
         sum2 += invalid.iter().sum::<i64>();
     }
