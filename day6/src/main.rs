@@ -50,32 +50,34 @@ fn problem2(content: &String) -> i64 {
     let mut ans2: i64 = 0;
     let mut buffer: Vec<char> = Vec::new();
 
-    let columns = content.lines().nth(0).unwrap().split("").count();
+    // Pre-split lines once
+    let lines: Vec<&str> = content.lines().collect();
+
+    // Pre-convert each line to Vec<char> for O(1) indexing
+    let grid: Vec<Vec<char>> = lines.iter().map(|line| line.chars().collect()).collect();
+
+    // Determine column count from the first line
+    let columns = grid.first().map(|l| l.len()).unwrap_or(0);
     for i in (0..=columns).rev() {
         for (j, line) in content.lines().enumerate() {
-            let num = match line.chars().nth(i) {
-                Some(x) => x,
-                None => ' ',
-            };
-            match num {
+            let c = line.chars().nth(i).unwrap_or(' ');
+            match c {
                 ' ' => {
                     if j == content.lines().count() - 1 {
                         buffer.push(' ');
                     }
                 }
                 '+' => {
-                    let y = parse_buffer(&buffer);
-                    // println!("+{:?}", y);
-                    ans2 += y.iter().sum::<i64>();
+                    let vals = parse_buffer(&buffer);
+                    ans2 += vals.iter().sum::<i64>();
                     buffer.clear();
                 }
                 '*' => {
-                    let y = parse_buffer(&buffer);
-                    // println!("*{:?}", y);
-                    ans2 += y.iter().product::<i64>();
+                    let vals = parse_buffer(&buffer);
+                    ans2 += vals.iter().product::<i64>();
                     buffer.clear();
                 }
-                _ => buffer.push(num),
+                _ => buffer.push(c),
             }
         }
     }
@@ -87,10 +89,8 @@ fn main() {
     let content = fs::read_to_string("./input.txt").expect("Error reading a file");
 
     let ans1: i64 = problem1(&content);
-    println!("{:?}", ans1);
+    println!("Answer to question 1: {}", ans1);
 
     let ans2: i64 = problem2(&content);
-    println!("{:?}", ans2);
-
     println!("Answer to question 2: {}", ans2);
 }
